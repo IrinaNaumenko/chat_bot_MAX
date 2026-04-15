@@ -117,7 +117,47 @@ def handle_catalog(chat_id):
         "🛍 Каталог\n\nВыбери категорию:",
         buttons=build_catalog_buttons(),
     )
-
+from config import (
+    MAX_TOKEN,
+    BASE_URL,
+    ADDRESSES_TEXT,
+    CHILDREN_CHANNEL_URL,
+    LINGERIE_CHANNEL_URL,
+    STORE_1_MAP_URL,
+    STORE_2_MAP_URL,
+    STORE_3_MAP_URL,
+)
+def build_address_buttons():
+    return [
+        [
+            {
+                "type": "link",
+                "text": "🗺 М. Горького, 37",
+                "url": STORE_1_MAP_URL,
+            }
+        ],
+        [
+            {
+                "type": "link",
+                "text": "🗺 Ф. Энгельса, 11",
+                "url": STORE_2_MAP_URL,
+            }
+        ],
+        [
+            {
+                "type": "link",
+                "text": "🗺 Ф. Энгельса, 37",
+                "url": STORE_3_MAP_URL,
+            }
+        ],
+        [
+            {
+                "type": "message",
+                "text": "🔙 Назад",
+                "payload": "назад",
+            }
+        ],
+    ]
 
 def send_catalog_tag(chat_id, title, tag):
     text = (
@@ -141,7 +181,7 @@ def handle_text(chat_id, text):
         return
 
     if "адрес" in text:
-        send_message(chat_id, ADDRESSES_TEXT, buttons=build_main_buttons())
+        send_message(chat_id, ADDRESSES_TEXT, buttons=build_address_buttons())
         return
 
     for key, (title, tag) in CATEGORY_MAP.items():
@@ -160,7 +200,7 @@ def handle_callback(chat_id, payload):
         return
 
     if payload == "адрес":
-        send_message(chat_id, ADDRESSES_TEXT, buttons=build_main_buttons())
+        send_message(chat_id, ADDRESSES_TEXT, buttons=build_address_buttons())
         return
 
     if payload == "назад":

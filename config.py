@@ -17,8 +17,12 @@ ADDRESSES_TEXT = (
     "🏬 г. Энгельс\n"
     "📌 пр-т Ф. Энгельса, д. 11\n\n"
     "🏬 г. Энгельс\n"
-    "📌 пр-т Ф. Энгельса, д. 37"
+    "📌 пр-т Ф. Энгельса, д. 37\n\n"
+    "Нажмите кнопку ниже, чтобы открыть магазин на карте 👇"
 )
 
+STORE_1_MAP_URL = "https://yandex.ru/maps/?text=Энгельс%20ул.%20М.%20Горького%2037"
+STORE_2_MAP_URL = "https://yandex.ru/maps/?text=Энгельс%20пр-т%20Ф.%20Энгельса%2011"
+STORE_3_MAP_URL = "https://yandex.ru/maps/?text=Энгельс%20пр-т%20Ф.%20Энгельса%2037"
 if not MAX_TOKEN:
     print("WARNING: MAX_TOKEN is empty")
