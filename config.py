@@ -10,9 +10,14 @@ WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
 CHILDREN_CHANNEL_URL = os.getenv("CHILDREN_CHANNEL_URL", "")
 LINGERIE_CHANNEL_URL = os.getenv("LINGERIE_CHANNEL_URL", "")
 
-ADDRESSES_TEXT = os.getenv(
-    "ADDRESSES_TEXT",
-    "📍 Наши адреса\n\n— Адрес 1\n— Адрес 2"
+ADDRESSES_TEXT = (
+    "📍 Наши магазины\n\n"
+    "🏬 г. Энгельс\n"
+    "📌 ул. М. Горького, д. 37\n\n"
+    "🏬 г. Энгельс\n"
+    "📌 пр-т Ф. Энгельса, д. 11\n\n"
+    "🏬 г. Энгельс\n"
+    "📌 пр-т Ф. Энгельса, д. 37"
 )
 
 if not MAX_TOKEN:
