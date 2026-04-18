@@ -1,28 +1,29 @@
-import os
-from dotenv import load_dotenv
+from flask import Flask, request, jsonify
+from bot import process_update
+from config import WEBHOOK_SECRET
+import threading
 
-load_dotenv()
+app = Flask(__name__)
 
-MAX_TOKEN = os.getenv("MAX_TOKEN", "")
-BASE_URL = os.getenv("BASE_URL", "https://platform-api.max.ru")
-WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
 
-CHILDREN_CHANNEL_URL = os.getenv("CHILDREN_CHANNEL_URL", "")
-LINGERIE_CHANNEL_URL = os.getenv("LINGERIE_CHANNEL_URL", "")
+@app.get("/health")
+def health():
+    return "ok", 200
 
-ADDRESSES_TEXT = (
-    "📍 Наши магазины\n\n"
-    "🏬 г. Энгельс\n"
-    "📌 ул. М. Горького, д. 37\n\n"
-    "🏬 г. Энгельс\n"
-    "📌 пр-т Ф. Энгельса, д. 11\n\n"
-    "🏬 г. Энгельс\n"
-    "📌 пр-т Ф. Энгельса, д. 37\n\n"
-    "Нажмите кнопку ниже, чтобы открыть магазин на карте 👇"
-)
 
-STORE_1_MAP_URL = "https://yandex.ru/maps/?text=Энгельс%20ул.%20М.%20Горького%2037"
-STORE_2_MAP_URL = "https://yandex.ru/maps/?text=Энгельс%20пр-т%20Ф.%20Энгельса%2011"
-STORE_3_MAP_URL = "https://yandex.ru/maps/?text=Энгельс%20пр-т%20Ф.%20Энгельса%2037"
-if not MAX_TOKEN:
-    print("WARNING: MAX_TOKEN is empty")
+@app.post("/webhook")
+def webhook():
+    incoming_secret = request.headers.get("X-Max-Bot-Api-Secret", "")
+    if WEBHOOK_SECRET and incoming_secret != WEBHOOK_SECRET:
+        return jsonify({"error": "forbidden"}), 403
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "bad json"}), 400
+
+    threading.Thread(target=process_update, args=(data,), daemon=True).start()
+    return jsonify({"status": "ok"}), 200
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
