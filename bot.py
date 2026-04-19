@@ -8,6 +8,7 @@ from config import (
     CHILDREN_CHANNEL_URL,
     LINGERIE_CHANNEL_URL,
     MANAGER_URL,
+    OWNER_URL,
     CATALOG,
     STORE_1_MAP_URL,
     STORE_2_MAP_URL,
@@ -57,6 +58,13 @@ def build_main_buttons():
                 "type": "message",
                 "text": "📍 Адрес",
                 "payload": "адрес",
+            }
+        ],
+        [
+            {
+                "type": "message",
+                "text": "📝 Жалобы и предложения",
+                "payload": "feedback",
             }
         ],
     ]
@@ -281,7 +289,6 @@ def handle_text(chat_id, user_id, text):
 
     handle_start(chat_id)
 
-
 def handle_callback(chat_id, user_id, payload):
     payload = (payload or "").strip().lower()
 
@@ -301,12 +308,39 @@ def handle_callback(chat_id, user_id, payload):
         handle_start(chat_id)
         return
 
+    if payload == "feedback":
+        text = (
+            "📝 Жалобы и предложения\n\n"
+            "Если у вас есть пожелания, замечания или идеи по улучшению, "
+            "напишите нам в личные сообщения 🤍\n\n"
+            "Нам важно ваше мнение"
+        )
+
+        buttons = [
+            [
+                {
+                    "type": "link",
+                    "text": "💬 Написать нам",
+                    "url": OWNER_URL,
+                }
+            ],
+            [
+                {
+                    "type": "message",
+                    "text": "🔙 Назад",
+                    "payload": "назад",
+                }
+            ],
+        ]
+
+        send_message(chat_id, text, buttons=buttons)
+        return
+
     if payload in CATALOG:
         send_catalog_item(chat_id, CATALOG[payload])
         return
 
     handle_start(chat_id)
-
 
 def process_update(update):
     update_type = update.get("update_type")
