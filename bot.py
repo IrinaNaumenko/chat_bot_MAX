@@ -13,6 +13,7 @@ from config import (
     STORE_1_MAP_URL,
     STORE_2_MAP_URL,
     STORE_3_MAP_URL,
+    CATALOG_CHAT_ID,
 )
 from fashion_fortune import get_daily_fortune
 
@@ -198,6 +199,131 @@ def send_message(chat_id, text, buttons=None):
     print("SEND:", response.status_code, response.text)
     response.raise_for_status()
 
+def get_channel_messages(chat_id, count=20):
+    try:
+        response = session.get(
+            f"{BASE_URL}/messages",
+            params={"chat_id": chat_id, "count": count},
+            timeout=10,
+        )
+
+        print("GET MESSAGES:", response.status_code)
+
+        if response.status_code != 200:
+            print("ERROR RESPONSE:", response.text)
+            return []
+
+        data = response.json()
+        return data.get("messages", [])
+
+    except Exception as e:
+        print("GET CHANNEL ERROR:", str(e))
+        return []
+
+
+def find_posts_by_tag(tag, limit=5):
+    messages = get_channel_messages(CATALOG_CHAT_ID, count=50)
+    hashtag = f"#{tag}".lower()
+    results = []
+
+    for msg in messages:
+        body = msg.get("body", {})
+        text = (body.get("text") or "").strip()
+
+        if hashtag in text.lower():
+            results.append(msg)
+
+        if len(results) >= limit:
+            break
+
+    return results
+
+
+def send_channel_post(chat_id, msg):
+    body = msg.get("body", {})
+    text = body.get("text", "") or ""
+    attachments = body.get("attachments", []) or []
+    post_url = msg.get("url", "")
+
+    new_attachments = []
+
+    for att in attachments:
+        if att.get("type") == "image":
+            new_attachments.append(att)
+
+    buttons = []
+
+    if post_url:
+        buttons.append([
+            {
+                "type": "link",
+                "text": "🔗 Открыть пост",
+                "url": post_url,
+            }
+        ])
+
+    if MANAGER_URL:
+        buttons.append([
+            {
+                "type": "link",
+                "text": "💬 Уточнить наличие",
+                "url": MANAGER_URL,
+            }
+        ])
+
+    buttons.append([
+        {
+            "type": "message",
+            "text": "🔙 Назад",
+            "payload": "каталог",
+        }
+    ])
+
+    if buttons:
+        new_attachments.append(
+            {
+                "type": "inline_keyboard",
+                "payload": {"buttons": buttons}
+            }
+        )
+
+    payload = {
+        "text": text if text else "✨ Товар из категории",
+        "attachments": new_attachments
+    }
+
+    response = session.post(
+        f"{BASE_URL}/messages",
+        params={"chat_id": chat_id},
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        timeout=15,
+    )
+
+    print("SEND POST:", response.status_code, response.text)
+    response.raise_for_status()
+
+
+def send_products_by_category(chat_id, item):
+    tag = item["tag"]
+    title = item["title"]
+
+    posts = find_posts_by_tag(tag, limit=5)
+
+    if not posts:
+        send_message(
+            chat_id,
+            f"{title}\n\nПока ничего не найдено по хэштегу #{tag} 🤍",
+            buttons=build_catalog_buttons(),
+        )
+        return
+
+    send_message(
+        chat_id,
+        f"{title}\n\nВот что найдено по хэштегу #{tag} 👇"
+    )
+
+    for post in posts:
+        send_channel_post(chat_id, post)
 
 def handle_start(chat_id):
     text = (
@@ -272,7 +398,7 @@ def handle_text(chat_id, user_id, text):
 
     for key, item in CATALOG.items():
         if key in text:
-            send_catalog_item(chat_id, item)
+            send_products_by_category(chat_id, item)
             return
 
     handle_start(chat_id)
@@ -297,7 +423,7 @@ def handle_callback(chat_id, user_id, payload):
         return
 
     if payload in CATALOG:
-        send_catalog_item(chat_id, CATALOG[payload])
+        send_products_by_category(chat_id, CATALOG[payload])
         return
 
     handle_start(chat_id)
