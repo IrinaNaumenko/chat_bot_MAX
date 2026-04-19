@@ -12,7 +12,7 @@ from config import (
     CATALOG,
     STORE_1_MAP_URL,
     STORE_2_MAP_URL,
-     STORE_3_MAP_URL,
+    STORE_3_MAP_URL,
 )
 from fashion_fortune import get_daily_fortune
 
