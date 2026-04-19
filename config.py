@@ -64,6 +64,11 @@ CATALOG = {
         "tag": "брюки",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
+    "джинсы": {
+    "title": "👖 Джинсы",
+    "tag": "джинсы",
+    "channel_url": CHILDREN_CHANNEL_URL,
+    },
     "спортивные_костюмы": {
         "title": "🏃 Спортивные костюмы",
         "tag": "костюмы_спортивные",
