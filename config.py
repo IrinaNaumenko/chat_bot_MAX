@@ -39,49 +39,89 @@ ADDRESSES_TEXT = (
 )
 
 CATALOG = {
-    "платье": {
+    "платья": {
         "title": "👗 Платья",
-        "tag": "платье",
+        "tag": "платья",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
-    "джинсы": {
-        "title": "👖 Джинсы",
-        "tag": "джинсы",
+    "рубашки": {
+        "title": "👔 Рубашки",
+        "tag": "рубашки",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
-    "верхняя": {
-        "title": "🧥 Верхняя одежда",
-        "tag": "верхняя",
+    "кофты": {
+        "title": "🧶 Кофты",
+        "tag": "кофты",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
-    "футболка": {
-        "title": "👕 Футболки",
-        "tag": "футболка",
-        "channel_url": CHILDREN_CHANNEL_URL,
-    },
-    "блуза": {
-        "title": "👚 Блузы",
-        "tag": "блуза",
-        "channel_url": CHILDREN_CHANNEL_URL,
-    },
-    "юбка": {
+    "юбки": {
         "title": "👗 Юбки",
-        "tag": "юбка",
+        "tag": "юбки",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "брюки": {
+        "title": "👖 Брюки",
+        "tag": "брюки",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "спортивные_костюмы": {
+        "title": "🏃 Спортивные костюмы",
+        "tag": "костюмы_спортивные",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "классические_костюмы": {
+        "title": "🕴 Классические костюмы",
+        "tag": "костюмы_классика",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "пиджаки": {
+        "title": "🧥 Пиджаки",
+        "tag": "пиджаки",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "джинсовки": {
+        "title": "💙 Джинсовки",
+        "tag": "джинсовки",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "шорты": {
+        "title": "🩳 Шорты",
+        "tag": "шорты",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "куртки": {
+    "title": "🧥 Куртки",
+    "tag": "куртки",
+    "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "майки": {
+    "title": "👕 Майки",
+    "tag": "майки",
+    "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "ремни": {
+    "title": "🪶 Ремни",
+    "tag": "ремни",
+    "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "сумки": {
+        "title": "👜 Сумки",
+        "tag": "сумки",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
     "аксессуары": {
-        "title": "👜 Аксессуары",
+        "title": "✨ Аксессуары",
         "tag": "аксессуары",
-        "channel_url": LINGERIE_CHANNEL_URL,
-    },
-    "новинка": {
-        "title": "✨ Новинки",
-        "tag": "новинка",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
-    "распродажа": {
-        "title": "🔥 Распродажа",
-        "tag": "распродажа",
+    "солнечные_очки": {
+        "title": "🕶 Солнечные очки",
+        "tag": "солнечные_очки",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "верхняя_одежда": {
+        "title": "🧥 Верхняя одежда",
+        "tag": "верхняя_одежда",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
 }
