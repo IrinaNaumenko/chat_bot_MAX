@@ -62,24 +62,12 @@ def build_main_buttons():
         ],
         [
             {
-                "type": "message",
+                "type": "link",
                 "text": "📝 Жалобы и предложения",
-                "payload": "feedback",
+                "url": OWNER_URL,
             }
-        ],
+        ]
     ]
-
-    if MANAGER_URL:
-        buttons.insert(
-            3,
-            [
-                {
-                    "type": "link",
-                    "text": "💬 Уточнить наличие",
-                    "url": MANAGER_URL,
-                }
-            ],
-        )
 
     return buttons
 
@@ -306,34 +294,6 @@ def handle_callback(chat_id, user_id, payload):
 
     if payload == "назад":
         handle_start(chat_id)
-        return
-
-    if payload == "feedback":
-        text = (
-            "📝 Жалобы и предложения\n\n"
-            "Если у вас есть пожелания, замечания или идеи по улучшению, "
-            "напишите нам в личные сообщения 🤍\n\n"
-            "Нам важно ваше мнение"
-        )
-
-        buttons = [
-            [
-                {
-                    "type": "link",
-                    "text": "💬 Написать нам",
-                    "url": OWNER_URL,
-                }
-            ],
-            [
-                {
-                    "type": "message",
-                    "text": "🔙 Назад",
-                    "payload": "назад",
-                }
-            ],
-        ]
-
-        send_message(chat_id, text, buttons=buttons)
         return
 
     if payload in CATALOG:
