@@ -1,29 +1,121 @@
-from flask import Flask, request, jsonify
-from bot import process_update
-from config import WEBHOOK_SECRET
-import threading
+import os
+from dotenv import load_dotenv
 
-app = Flask(__name__)
+load_dotenv()
 
+MAX_TOKEN = os.getenv("MAX_TOKEN", "")
+BASE_URL = os.getenv("BASE_URL", "https://platform-api.max.ru")
+WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
 
-@app.get("/health")
-def health():
-    return "ok", 200
+CHILDREN_CHANNEL_URL = os.getenv("CHILDREN_CHANNEL_URL", "")
+LINGERIE_CHANNEL_URL = os.getenv("LINGERIE_CHANNEL_URL", "")
+MANAGER_URL = os.getenv("MANAGER_URL", "")
 
+STORE_1_MAP_URL = os.getenv(
+    "STORE_1_MAP_URL",
+    "https://yandex.ru/maps/?text=Энгельс%20ул.%20М.%20Горького%2037"
+)
 
-@app.post("/webhook")
-def webhook():
-    incoming_secret = request.headers.get("X-Max-Bot-Api-Secret", "")
-    if WEBHOOK_SECRET and incoming_secret != WEBHOOK_SECRET:
-        return jsonify({"error": "forbidden"}), 403
+STORE_2_MAP_URL = os.getenv(
+    "STORE_2_MAP_URL",
+    "https://yandex.ru/maps/?text=Энгельс%20пр-т%20Ф.%20Энгельса%2011"
+)
 
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({"error": "bad json"}), 400
+STORE_3_MAP_URL = os.getenv(
+    "STORE_3_MAP_URL",
+    "https://yandex.ru/maps/?text=Энгельс%20пр-т%20Ф.%20Энгельса%2037"
+)
 
-    threading.Thread(target=process_update, args=(data,), daemon=True).start()
-    return jsonify({"status": "ok"}), 200
+ADDRESSES_TEXT = (
+    "📍 Наши магазины\n\n"
+    "🏬 г. Энгельс\n"
+    "📌 ул. М. Горького, д. 37\n\n"
+    "🏬 г. Энгельс\n"
+    "📌 пр-т Ф. Энгельса, д. 11\n\n"
+    "🏬 г. Энгельс\n"
+    "📌 пр-т Ф. Энгельса, д. 37"
+)
 
+CATALOG = {
+    "платье": {
+        "title": "👗 Платья",
+        "tag": "платье",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "джинсы": {
+        "title": "👖 Джинсы",
+        "tag": "джинсы",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "верхняя": {
+        "title": "🧥 Верхняя одежда",
+        "tag": "верхняя",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "футболка": {
+        "title": "👕 Футболки",
+        "tag": "футболка",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "блуза": {
+        "title": "👚 Блузы",
+        "tag": "блуза",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "юбка": {
+        "title": "👗 Юбки",
+        "tag": "юбка",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "аксессуары": {
+        "title": "👜 Аксессуары",
+        "tag": "аксессуары",
+        "channel_url": LINGERIE_CHANNEL_URL,
+    },
+    "новинка": {
+        "title": "✨ Новинки",
+        "tag": "новинка",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "распродажа": {
+        "title": "🔥 Распродажа",
+        "tag": "распродажа",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+}
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+FASHION_PREDICTIONS = [
+    "✨ Сегодня твой стиль притягивает взгляды — смело выбирай образ, который тебе по душе.",
+    "👗 Сегодня удачный день для красивого и уверенного образа.",
+    "💖 Твой вкус сегодня особенно точный — доверься себе.",
+    "🌟 Сегодня ты особенно ярко выглядишь в том, что любишь.",
+    "👜 Один удачный аксессуар сегодня может сделать весь образ незабываемым.",
+    "👠 Сегодня мода на твоей стороне — выбирай смело.",
+    "✨ Ты сегодня излучаешь особенный шарм — подчеркни его любимой вещью.",
+    "💫 Всё говорит о том, что сегодня твой день для стильного настроения.",
+    "🩷 Сегодня твой образ может подарить тебе много комплиментов.",
+    "👗 Сегодня идеально подойдёт что-то женственное и красивое.",
+    "🔥 Сегодня твой стиль точно не останется незамеченным.",
+    "🌸 Мягкие и нежные оттенки сегодня особенно тебе подойдут.",
+    "🖤 Сегодня твоя уверенность — главный элемент образа.",
+    "✨ Сегодня тебе особенно идёт всё, что подчёркивает твою индивидуальность.",
+    "💎 Сегодня даже маленькая стильная деталь сыграет большую роль.",
+    "👛 Сегодня отличный день для модного вдохновения.",
+    "🌷 Сегодня стоит выбрать образ, в котором ты чувствуешь себя собой.",
+    "💫 Сегодня твоя энергия идеально сочетается с красивыми вещами.",
+    "👚 Сегодня стоит обратить внимание на лёгкие и комфортные образы.",
+    "🛍 Сегодня удачный день, чтобы присмотреть что-то особенное для себя.",
+    "✨ Сегодня твой гардероб может подарить тебе особенное настроение.",
+    "👠 Сегодня самое время блистать в любимом образе.",
+    "💖 Сегодня ты особенно красива в том, что подчёркивает твою женственность.",
+    "🌟 Твой сегодняшний стиль способен сделать день ярче.",
+    "👜 Сегодня аксессуары играют на твоей стороне.",
+    "💫 Удачный день для красивых сочетаний и вдохновения.",
+    "👗 Сегодня тебе особенно подойдут лёгкость и изящество.",
+    "🩷 Сегодня твой образ может стать настоящим источником уверенности.",
+    "🔥 Сегодня можно смело примерять что-то новое.",
+    "🌸 Сегодня твой стиль наполнен мягкостью и шармом.",
+]
+
+if not MAX_TOKEN:
+    print("WARNING: MAX_TOKEN is empty")

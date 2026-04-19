@@ -7,16 +7,23 @@ from config import (
     ADDRESSES_TEXT,
     CHILDREN_CHANNEL_URL,
     LINGERIE_CHANNEL_URL,
+    MANAGER_URL,
+    CATALOG,
+    STORE_1_MAP_URL,
+    STORE_2_MAP_URL,
+    STORE_3_MAP_URL,
 )
+from fashion_fortune import get_daily_fortune
 
-HEADERS = {
+session = requests.Session()
+session.headers.update({
     "Authorization": MAX_TOKEN,
     "Content-Type": "application/json; charset=utf-8",
-}
+})
 
 
 def build_main_buttons():
-    return [
+    buttons = [
         [
             {
                 "type": "link",
@@ -41,92 +48,57 @@ def build_main_buttons():
         [
             {
                 "type": "message",
+                "text": "🔮 Модная гадалка",
+                "payload": "гадалка",
+            }
+        ],
+        [
+            {
+                "type": "message",
                 "text": "📍 Адрес",
                 "payload": "адрес",
             }
         ],
     ]
 
+    if MANAGER_URL:
+        buttons.insert(
+            3,
+            [
+                {
+                    "type": "link",
+                    "text": "💬 Уточнить наличие",
+                    "url": MANAGER_URL,
+                }
+            ],
+        )
+
+    return buttons
+
 
 def build_catalog_buttons():
-    return [
-        [{"type": "message", "text": "👗 Платья", "payload": "платье"}],
-        [{"type": "message", "text": "👖 Джинсы", "payload": "джинсы"}],
-        [{"type": "message", "text": "🧥 Верхняя одежда", "payload": "верхняя"}],
-        [{"type": "message", "text": "👕 Футболки", "payload": "футболка"}],
-        [{"type": "message", "text": "👚 Блузы", "payload": "блуза"}],
-        [{"type": "message", "text": "👗 Юбки", "payload": "юбка"}],
-        [{"type": "message", "text": "👜 Аксессуары", "payload": "аксессуары"}],
-        [{"type": "message", "text": "✨ Новинки", "payload": "новинка"}],
-        [{"type": "message", "text": "🔥 Распродажа", "payload": "распродажа"}],
-        [{"type": "message", "text": "🔙 Назад", "payload": "назад"}],
-    ]
+    buttons = []
 
-
-def send_message(chat_id, text, buttons=None):
-    payload = {
-        "text": text
-    }
-
-    if buttons:
-        payload["attachments"] = [
+    for payload, item in CATALOG.items():
+        buttons.append([
             {
-                "type": "inline_keyboard",
-                "payload": {
-                    "buttons": buttons
-                }
+                "type": "message",
+                "text": item["title"],
+                "payload": payload,
             }
-        ]
+        ])
 
-    response = requests.post(
-        f"{BASE_URL}/messages",
-        params={"chat_id": chat_id},
-        headers=HEADERS,
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        timeout=15,
-    )
+    buttons.append([
+        {
+            "type": "message",
+            "text": "🔙 Назад",
+            "payload": "назад",
+        }
+    ])
 
-    print("SEND:", response.status_code, response.text)
-    response.raise_for_status()
-
-
-CATEGORY_MAP = {
-    "платье": ("👗 Платья", "платье"),
-    "джинсы": ("👖 Джинсы", "джинсы"),
-    "верхняя": ("🧥 Верхняя одежда", "верхняя"),
-    "футболка": ("👕 Футболки", "футболка"),
-    "блуза": ("👚 Блузы", "блуза"),
-    "юбка": ("👗 Юбки", "юбка"),
-    "аксессуары": ("👜 Аксессуары", "аксессуары"),
-    "новинка": ("✨ Новинки", "новинка"),
-    "распродажа": ("🔥 Распродажа", "распродажа"),
-}
+    return buttons
 
 
-def handle_start(chat_id):
-    send_message(
-        chat_id,
-        "Добро пожаловать 🤍\n\nПосмотри, что есть:",
-        buttons=build_main_buttons(),
-    )
-
-
-def handle_catalog(chat_id):
-    send_message(
-        chat_id,
-        "🛍 Каталог\n\nВыбери категорию:",
-        buttons=build_catalog_buttons(),
-    )
-from config import (
-    MAX_TOKEN,
-    BASE_URL,
-    ADDRESSES_TEXT,
-    CHILDREN_CHANNEL_URL,
-    LINGERIE_CHANNEL_URL,
-    STORE_1_MAP_URL,
-    STORE_2_MAP_URL,
-    STORE_3_MAP_URL,
-)
 def build_address_buttons():
     return [
         [
@@ -159,16 +131,130 @@ def build_address_buttons():
         ],
     ]
 
-def send_catalog_tag(chat_id, title, tag):
+
+def build_category_buttons(channel_url):
+    buttons = [
+        [
+            {
+                "type": "link",
+                "text": "🛍 Открыть канал",
+                "url": channel_url,
+            }
+        ],
+        [
+            {
+                "type": "message",
+                "text": "🔙 Назад",
+                "payload": "каталог",
+            }
+        ],
+    ]
+
+    if MANAGER_URL:
+        buttons.insert(
+            1,
+            [
+                {
+                    "type": "link",
+                    "text": "💬 Уточнить наличие",
+                    "url": MANAGER_URL,
+                }
+            ],
+        )
+
+    return buttons
+
+
+def build_fortune_buttons():
+    return [
+        [
+            {
+                "type": "message",
+                "text": "🔙 Назад",
+                "payload": "назад",
+            }
+        ]
+    ]
+
+
+def send_message(chat_id, text, buttons=None):
+    payload = {
+        "text": text
+    }
+
+    if buttons:
+        payload["attachments"] = [
+            {
+                "type": "inline_keyboard",
+                "payload": {
+                    "buttons": buttons
+                }
+            }
+        ]
+
+    response = session.post(
+        f"{BASE_URL}/messages",
+        params={"chat_id": chat_id},
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        timeout=15,
+    )
+
+    print("SEND:", response.status_code, response.text)
+    response.raise_for_status()
+
+
+def handle_start(chat_id):
     text = (
-        f"{title}\n\n"
-        f"Мы уже всё подобрали за тебя 🤍\n"
-        f"Открой канал и ищи по тегу: #{tag}"
+        "Добро пожаловать 🤍\n\n"
+        "Посмотри, что есть:"
+    )
+    send_message(chat_id, text, buttons=build_main_buttons())
+
+
+def handle_catalog(chat_id):
+    text = (
+        "🛍 Каталог\n\n"
+        "Выберите, что вам интересно 👇"
     )
     send_message(chat_id, text, buttons=build_catalog_buttons())
 
 
-def handle_text(chat_id, text):
+def send_catalog_item(chat_id, item):
+    title = item["title"]
+    tag = item["tag"]
+    channel_url = item["channel_url"]
+
+    text = (
+        f"{title}\n\n"
+        f"Все актуальные модели уже в канале 🤍\n\n"
+        f"Открой канал и посмотри публикации с хэштегом #{tag}\n\n"
+        f"Если хочешь — поможем подобрать размер 👇"
+    )
+
+    send_message(chat_id, text, buttons=build_category_buttons(channel_url))
+
+
+def handle_fashion_fortune(chat_id, user_id):
+    if not user_id:
+        send_message(
+            chat_id,
+            "🔮 Не удалось определить пользователя для прогноза.",
+            buttons=build_main_buttons(),
+        )
+        return
+
+    prediction = get_daily_fortune(user_id)
+
+    text = (
+        "🔮 Модная гадалка\n\n"
+        f"{prediction}\n\n"
+        "Завтра вас будет ждать новый прогноз 🤍"
+    )
+
+    send_message(chat_id, text, buttons=build_fortune_buttons())
+
+
+def handle_text(chat_id, user_id, text):
     text = (text or "").strip().lower()
     print("TEXT:", text)
 
@@ -180,23 +266,31 @@ def handle_text(chat_id, text):
         handle_catalog(chat_id)
         return
 
+    if "гадалка" in text or "прогноз" in text:
+        handle_fashion_fortune(chat_id, user_id)
+        return
+
     if "адрес" in text:
         send_message(chat_id, ADDRESSES_TEXT, buttons=build_address_buttons())
         return
 
-    for key, (title, tag) in CATEGORY_MAP.items():
+    for key, item in CATALOG.items():
         if key in text:
-            send_catalog_tag(chat_id, title, tag)
+            send_catalog_item(chat_id, item)
             return
 
     handle_start(chat_id)
 
 
-def handle_callback(chat_id, payload):
+def handle_callback(chat_id, user_id, payload):
     payload = (payload or "").strip().lower()
 
     if payload == "каталог":
         handle_catalog(chat_id)
+        return
+
+    if payload == "гадалка":
+        handle_fashion_fortune(chat_id, user_id)
         return
 
     if payload == "адрес":
@@ -207,9 +301,8 @@ def handle_callback(chat_id, payload):
         handle_start(chat_id)
         return
 
-    if payload in CATEGORY_MAP:
-        title, tag = CATEGORY_MAP[payload]
-        send_catalog_tag(chat_id, title, tag)
+    if payload in CATALOG:
+        send_catalog_item(chat_id, CATALOG[payload])
         return
 
     handle_start(chat_id)
@@ -228,19 +321,26 @@ def process_update(update):
     if update_type == "message_callback":
         callback = update.get("callback", {})
         payload = callback.get("payload", "")
-        chat_id = update.get("chat_id")
 
+        chat_id = update.get("chat_id")
         if not chat_id:
             chat_id = update.get("message", {}).get("recipient", {}).get("chat_id")
 
+        user_id = (
+            update.get("message", {})
+            .get("sender", {})
+            .get("user_id")
+        )
+
         if chat_id:
-            handle_callback(chat_id, payload)
+            handle_callback(chat_id, user_id, payload)
         return
 
     if update_type == "message_created":
         message = update.get("message", {})
         chat_id = message.get("recipient", {}).get("chat_id")
         text = message.get("body", {}).get("text", "")
+        user_id = message.get("sender", {}).get("user_id")
 
         if chat_id:
-            handle_text(chat_id, text)
+            handle_text(chat_id, user_id, text)
