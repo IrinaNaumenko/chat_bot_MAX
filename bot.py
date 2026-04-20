@@ -44,21 +44,21 @@ def build_main_buttons():
         ],
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "🛍 Каталог",
                 "payload": "каталог",
             }
         ],
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "🔮 Модная гадалка",
                 "payload": "гадалка",
             }
         ],
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "📍 Адрес",
                 "payload": "адрес",
             }
@@ -81,7 +81,7 @@ def build_catalog_buttons():
     for payload, item in CATALOG.items():
         buttons.append([
             {
-                "type": "message",
+                "type": "callback",
                 "text": item["title"],
                 "payload": payload,
             }
@@ -89,7 +89,7 @@ def build_catalog_buttons():
 
     buttons.append([
         {
-            "type": "message",
+            "type": "callback",
             "text": "🔙 Назад",
             "payload": "назад",
         }
@@ -102,7 +102,7 @@ def build_address_buttons():
     return [
         [
             {
-                "type": "link",
+                "type": "callback",
                 "text": "🗺 М. Горького, 37",
                 "url": STORE_1_MAP_URL,
             }
@@ -142,7 +142,7 @@ def build_category_buttons(channel_url):
         ],
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "🔙 Назад",
                 "payload": "каталог",
             }
@@ -168,7 +168,7 @@ def build_fortune_buttons():
     return [
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "🔙 Назад",
                 "payload": "назад",
             }
@@ -320,14 +320,14 @@ def build_show_more_buttons(category_key, offset):
     buttons = [
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "➕ Показать ещё",
                 "payload": f"more:{category_key}:{offset}",
             }
         ],
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "🔙 Назад",
                 "payload": "каталог",
             }
