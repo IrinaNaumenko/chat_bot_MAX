@@ -311,7 +311,7 @@ def build_back_to_catalog_button():
     return [
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "🔙 Назад",
                 "payload": "каталог",
             }
@@ -321,7 +321,7 @@ def build_show_more_buttons(category_key, offset):
     buttons = [
         [
             {
-                "type": "message",
+                "type": "callback",
                 "text": "➕ Показать ещё",
                 "payload": f"more:{category_key}:{offset}",
             }
