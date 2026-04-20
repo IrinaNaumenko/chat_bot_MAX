@@ -229,6 +229,11 @@ def find_posts_by_tag(tag):
         CATALOG_CHAT_ID,
         count=CATALOG_CHANNEL_FETCH_COUNT,
     )
+
+    # если API вернул пусто — пробуем меньше сообщений
+    if not messages:
+        messages = get_channel_messages(CATALOG_CHAT_ID, count=20)
+
     hashtag = f"#{tag}".lower()
     results = []
 
@@ -238,6 +243,8 @@ def find_posts_by_tag(tag):
 
         if hashtag in text.lower():
             results.append(msg)
+
+    return results
 
     return results
 def handle_start(chat_id):
