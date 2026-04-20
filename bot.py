@@ -318,16 +318,21 @@ def build_back_to_catalog_button():
         ]
     ]
 def build_show_more_buttons(category_key, offset):
-    buttons = [
+    return [
         [
             {
                 "type": "callback",
                 "text": "➕ Показать ещё",
                 "payload": f"more:{category_key}:{offset}",
             }
+        ],
+        [
+            {
+                "type": "message",
+                "text": "назад",
+            }
         ]
     ]
-    return buttons
 
 def send_products_by_category(chat_id, category_key, offset=0):
     item = CATALOG[category_key]
