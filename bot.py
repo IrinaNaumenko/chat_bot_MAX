@@ -223,14 +223,12 @@ def get_channel_messages(chat_id, count=20):
         print("GET CHANNEL ERROR:", str(e))
         return []
 
-
 def find_posts_by_tag(tag):
     messages = get_channel_messages(
         CATALOG_CHAT_ID,
         count=CATALOG_CHANNEL_FETCH_COUNT,
     )
 
-    # если API вернул пусто — пробуем меньше сообщений
     if not messages:
         messages = get_channel_messages(CATALOG_CHAT_ID, count=20)
 
@@ -246,7 +244,6 @@ def find_posts_by_tag(tag):
 
     return results
 
-    return results
 def handle_start(chat_id):
     text = (
         "Здравствуйте! 🤍\n\n"
@@ -337,6 +334,7 @@ def build_show_more_buttons(category_key, offset):
         ],
     ]
     return buttons
+
 def send_products_by_category(chat_id, category_key, offset=0):
     item = CATALOG[category_key]
     tag = item["tag"]
@@ -458,6 +456,7 @@ def handle_text(chat_id, user_id, text):
 
 def handle_callback(chat_id, user_id, payload):
     payload = (payload or "").strip().lower()
+    print("CALLBACK PAYLOAD:", repr(payload))
 
     if payload == "каталог":
         handle_catalog(chat_id)
@@ -492,7 +491,8 @@ def handle_callback(chat_id, user_id, payload):
         send_products_by_category(chat_id, payload)
         return
 
-    handle_start(chat_id)
+    print("UNKNOWN CALLBACK:", repr(payload))
+    return
 
 def process_update(update):
     update_type = update.get("update_type")
@@ -524,6 +524,10 @@ def process_update(update):
 
     if update_type == "message_created":
         message = update.get("message", {})
+
+        if message.get("recipient", {}).get("chat_type") == "channel":
+            return
+
         chat_id = message.get("recipient", {}).get("chat_id")
         text = message.get("body", {}).get("text", "")
         user_id = message.get("sender", {}).get("user_id")
