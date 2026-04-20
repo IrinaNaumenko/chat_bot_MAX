@@ -325,7 +325,7 @@ def build_show_more_buttons(category_key, offset):
             {
                 "type": "message",
                 "text": "➕ Показать ещё",
-                "payload": f"ещё:{category_key}:{offset}",
+                "payload": f"more:{category_key}:{offset}",
             }
         ],
         [
@@ -475,7 +475,7 @@ def handle_callback(chat_id, user_id, payload):
         handle_start(chat_id)
         return
 
-    if payload.startswith("ещё:"):
+    if payload.startswith("more:"):
         parts = payload.split(":")
         if len(parts) == 3:
             category_key = parts[1]
