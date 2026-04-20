@@ -451,6 +451,9 @@ def handle_text(chat_id, user_id, text):
         if key in text:
             send_products_by_category(chat_id, key)
             return
+    if "адрес" in text:
+        send_message(chat_id, ADDRESSES_TEXT, buttons=build_address_buttons())
+        return
 
     handle_start(chat_id)
 
