@@ -380,8 +380,7 @@ def send_products_by_category(chat_id, category_key, offset=0):
     else:
         send_message(
             chat_id,
-            "Это все товары в этой категории 🤍",
-            buttons=build_catalog_buttons(),
+            "Это все товары в этой категории 🤍"
         )
 
 def handle_catalog(chat_id):
