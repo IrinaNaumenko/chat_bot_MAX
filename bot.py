@@ -58,7 +58,7 @@ def build_main_buttons():
         ],
         [
             {
-                "type": "callback",
+                "type": "message",
                 "text": "📍 Адрес",
                 "payload": "адрес",
             }
