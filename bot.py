@@ -329,7 +329,7 @@ def build_show_more_buttons(category_key, offset):
         [
             {
                 "type": "message",
-                "text": "назад",
+                "text": " 🔙 Назад",
             }
         ]
     ]
