@@ -14,6 +14,8 @@ from config import (
     STORE_2_MAP_URL,
     STORE_3_MAP_URL,
     CATALOG_CHAT_ID,
+    CATALOG_PAGE_SIZE,
+    CATALOG_CHANNEL_FETCH_COUNT,
 )
 from fashion_fortune import get_daily_fortune
 
@@ -197,6 +199,7 @@ def send_message(chat_id, text, buttons=None):
     )
 
     print("SEND:", response.status_code, response.text)
+
     response.raise_for_status()
 
 def get_channel_messages(chat_id, count=20):
@@ -221,8 +224,11 @@ def get_channel_messages(chat_id, count=20):
         return []
 
 
-def find_posts_by_tag(tag, limit=5):
-    messages = get_channel_messages(CATALOG_CHAT_ID, count=50)
+def find_posts_by_tag(tag):
+    messages = get_channel_messages(
+        CATALOG_CHAT_ID,
+        count=CATALOG_CHANNEL_FETCH_COUNT,
+    )
     hashtag = f"#{tag}".lower()
     results = []
 
@@ -233,11 +239,14 @@ def find_posts_by_tag(tag, limit=5):
         if hashtag in text.lower():
             results.append(msg)
 
-        if len(results) >= limit:
-            break
-
     return results
-
+def handle_start(chat_id):
+    text = (
+        "Здравствуйте! 🤍\n\n"
+        "Добро пожаловать в магазин.\n"
+        "Выберите, что вас интересует 👇"
+    )
+    send_message(chat_id, text, buttons=build_main_buttons())
 
 def send_channel_post(chat_id, msg):
     body = msg.get("body", {})
@@ -300,14 +309,33 @@ def send_channel_post(chat_id, msg):
     )
 
     print("SEND POST:", response.status_code, response.text)
+
     response.raise_for_status()
 
-
-def send_products_by_category(chat_id, item):
+def build_show_more_buttons(category_key, offset):
+    buttons = [
+        [
+            {
+                "type": "message",
+                "text": "➕ Показать ещё",
+                "payload": f"ещё:{category_key}:{offset}",
+            }
+        ],
+        [
+            {
+                "type": "message",
+                "text": "🔙 Назад",
+                "payload": "каталог",
+            }
+        ],
+    ]
+    return buttons
+def send_products_by_category(chat_id, category_key, offset=0):
+    item = CATALOG[category_key]
     tag = item["tag"]
     title = item["title"]
 
-    posts = find_posts_by_tag(tag, limit=5)
+    posts = find_posts_by_tag(tag)
 
     if not posts:
         send_message(
@@ -317,21 +345,39 @@ def send_products_by_category(chat_id, item):
         )
         return
 
+    page_posts = posts[offset:offset + CATALOG_PAGE_SIZE]
+
+    if not page_posts:
+        send_message(
+            chat_id,
+            f"{title}\n\nБольше товаров по хэштегу #{tag} пока нет 🤍",
+            buttons=build_catalog_buttons(),
+        )
+        return
+
     send_message(
         chat_id,
-        f"{title}\n\nВот что найдено по хэштегу #{tag} 👇"
+        f"{title}\n\n"
+        f"Найдено товаров: {len(posts)}\n"
+        f"Показываю {offset + 1}–{offset + len(page_posts)} 👇"
     )
 
-    for post in posts:
+    for post in page_posts:
         send_channel_post(chat_id, post)
 
-def handle_start(chat_id):
-    text = (
-        "Добро пожаловать 🤍\n\n"
-        "Посмотри, что есть:"
-    )
-    send_message(chat_id, text, buttons=build_main_buttons())
-
+    next_offset = offset + CATALOG_PAGE_SIZE
+    if next_offset < len(posts):
+        send_message(
+            chat_id,
+            "Хочешь посмотреть ещё товары?",
+            buttons=build_show_more_buttons(category_key, next_offset),
+        )
+    else:
+        send_message(
+            chat_id,
+            "Это все товары в этой категории 🤍",
+            buttons=build_catalog_buttons(),
+        )
 
 def handle_catalog(chat_id):
     text = (
@@ -396,9 +442,9 @@ def handle_text(chat_id, user_id, text):
         send_message(chat_id, ADDRESSES_TEXT, buttons=build_address_buttons())
         return
 
-    for key, item in CATALOG.items():
+    for key in CATALOG:
         if key in text:
-            send_products_by_category(chat_id, item)
+            send_products_by_category(chat_id, key)
             return
 
     handle_start(chat_id)
@@ -422,8 +468,21 @@ def handle_callback(chat_id, user_id, payload):
         handle_start(chat_id)
         return
 
+    if payload.startswith("ещё:"):
+        parts = payload.split(":")
+        if len(parts) == 3:
+            category_key = parts[1]
+            try:
+                offset = int(parts[2])
+            except ValueError:
+                offset = 0
+
+            if category_key in CATALOG:
+                send_products_by_category(chat_id, category_key, offset)
+                return
+
     if payload in CATALOG:
-        send_products_by_category(chat_id, CATALOG[payload])
+        send_products_by_category(chat_id, payload)
         return
 
     handle_start(chat_id)

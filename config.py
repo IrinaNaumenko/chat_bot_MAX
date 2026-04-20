@@ -12,6 +12,8 @@ LINGERIE_CHANNEL_URL = os.getenv("LINGERIE_CHANNEL_URL", "")
 MANAGER_URL = os.getenv("MANAGER_URL", "")
 OWNER_URL = os.getenv("OWNER_URL", "")
 CATALOG_CHAT_ID = -73006296547845
+CATALOG_PAGE_SIZE = 5
+CATALOG_CHANNEL_FETCH_COUNT = 200
 
 STORE_1_MAP_URL = os.getenv(
     "STORE_1_MAP_URL",
@@ -52,6 +54,11 @@ CATALOG = {
     "кофты": {
         "title": "🧶 Кофты",
         "tag": "кофты",
+        "channel_url": CHILDREN_CHANNEL_URL,
+    },
+    "футболки": {
+        "title": "👗 Футболки",
+        "tag": "футболки",
         "channel_url": CHILDREN_CHANNEL_URL,
     },
     "юбки": {
