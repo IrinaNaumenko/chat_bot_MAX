@@ -102,7 +102,7 @@ def build_address_buttons():
     return [
         [
             {
-                "type": "callback",
+                "type": "link",
                 "text": "🗺 М. Горького, 37",
                 "url": STORE_1_MAP_URL,
             }
@@ -122,11 +122,11 @@ def build_address_buttons():
             }
         ],
         [
-            {
-                "type": "message",
-                "text": "🔙 Назад",
-                "payload": "назад",
-            }
+                {
+                    "type": "callback",
+                    "text": "🔙 Назад",
+                    "payload": "назад",
+                }
         ],
     ]
 
@@ -451,9 +451,6 @@ def handle_text(chat_id, user_id, text):
         if key in text:
             send_products_by_category(chat_id, key)
             return
-    if "адрес" in text:
-        send_message(chat_id, ADDRESSES_TEXT, buttons=build_address_buttons())
-        return
 
     handle_start(chat_id)
 
