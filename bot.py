@@ -307,7 +307,16 @@ def send_channel_post(chat_id, msg):
     print("SEND POST:", response.status_code, response.text)
 
     response.raise_for_status()
-
+def build_back_to_catalog_button():
+    return [
+        [
+            {
+                "type": "callback",
+                "text": "🔙 Назад",
+                "payload": "каталог",
+            }
+        ]
+    ]
 def build_show_more_buttons(category_key, offset):
     buttons = [
         [
@@ -316,14 +325,7 @@ def build_show_more_buttons(category_key, offset):
                 "text": "➕ Показать ещё",
                 "payload": f"more:{category_key}:{offset}",
             }
-        ],
-        [
-            {
-                "type": "callback",
-                "text": "🔙 Назад",
-                "payload": "каталог",
-            }
-        ],
+        ]
     ]
     return buttons
 
@@ -372,7 +374,8 @@ def send_products_by_category(chat_id, category_key, offset=0):
     else:
         send_message(
             chat_id,
-            "Это все товары в этой категории 🤍"
+            "Это все товары в этой категории 🤍",
+            buttons=build_back_to_catalog_button(),
         )
 
 def handle_catalog(chat_id):
