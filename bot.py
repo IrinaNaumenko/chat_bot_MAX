@@ -284,14 +284,6 @@ def send_channel_post(chat_id, msg):
             }
         ])
 
-    buttons.append([
-        {
-            "type": "message",
-            "text": "🔙 Назад",
-            "payload": "каталог",
-        }
-    ])
-
     if buttons:
         new_attachments.append(
             {
