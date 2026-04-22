@@ -103,7 +103,7 @@ def build_address_buttons():
         [
             {
                 "type": "link",
-                "text": "🗺 М. Горького, 37",
+                "text": "🗺 М. Горького, 28",
                 "url": STORE_1_MAP_URL,
             }
         ],
